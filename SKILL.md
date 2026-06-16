@@ -8,16 +8,15 @@ compatibility: Designed for TypeScript projects.
 
 ## When to use this
 
-- When asked to write, fix, or audit unit tests on TypeScript projects
+When asked to write, fix, or audit unit tests on TypeScript projects.
 
 ## When NOT to use this
 
-- UI tests
-- Simulation tests
+When writing end-to-end, integration, UI, or simulation tests.
 
 ## Rules
 
-- Example commands use pnpm, but always use the project's package manager.
+- Example commands use `pnpm`, but always use the project's package manager.
 - Do not modify application code unless specifically prompted to do so.
 - When asked to add tests, do not modify existing tests.
 - When asked to fix tests, do not add new tests.
@@ -50,7 +49,7 @@ Check for surviving mutants on the code being tested: `pnpm exec stryker run --m
 
 When asked to write new tests, DO NOT MODIFY APPLICATION CODE OR EXISTING TESTS.
 
-First, **assess existing tests** per the criteria above and make note of the coverage and mutation scores in the debrief.
+First, **assess existing tests** per the criteria above and make note of the coverage and mutation scores in a new debrief file. Use [the template](references/debrief-template.md).
 
 Second, **write tests following this process exactly**:
 
@@ -66,9 +65,7 @@ Do the following for each function/method in the module's interface, finishing o
 6. Re-check coverage: `pnpm exec vitest run src/foo.test.ts --coverage`
 7. Mutation test only the current function: `pnpm exec stryker run --mutate "src/foo.ts:<startLine>-<endLine>"`
 8. Revise the newly written tests and repeat steps 5a and 5b until test criteria (listed above) are met for the function.
-9. Add a section to the debrief 
-
-Finally, **debrief the user** on every function you iterated over using [the template](references/debrief-template.md).
+9. Update the debrief with a section on this function.
 
 ## Auditing Tests
 

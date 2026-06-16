@@ -1,6 +1,6 @@
 # Test Debriefs
 
-Format debriefs per the template below. If there is nothing to report in a function subsection, simply write "n/a". Output the debrief into a Markdown file in `test-writing-debriefs/`.
+Format debriefs per the template below. If there is nothing to report in a function subsection, simply write "n/a". Output the debrief into a Markdown file in `debriefs/`.
 
 # Debrief: {moduleName/fileName}
 
