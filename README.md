@@ -8,6 +8,8 @@ When prompted to write tests, models will generate property-based unit tests usi
 
 ## Usage
 
+Install: `npx skills add gpanakkal/crucible`
+
 - "write tests for [scope]" - add new tests without touching existing ones. Limit scope to a file/module/feature to avoid context bloat.
 - "audit tests for [scope]" - search for issues in existing tests
 - "verify the testing setup" - validate required dependencies and testing configs
