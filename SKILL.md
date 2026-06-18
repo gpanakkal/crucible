@@ -2,6 +2,8 @@
 name: crucible
 description: Write solid unit tests for TypeScript projects using property-based testing and mutation testing.
 compatibility: Designed for TypeScript projects.
+metadata:
+   disable-model-invocation: "false"
 ---
 
 # Crucible
@@ -17,8 +19,8 @@ When writing end-to-end, integration, UI, or simulation tests.
 ## Per-project opt-out
 Before activating, check whether the project has opted out of this skill. Look for any of the following:
 
-A .no-crucible file in the project root
-crucible: false anywhere in AGENTS.md or .claude/settings.json
+- A .no-crucible file in the project root
+- "crucible: false" anywhere in AGENTS.md or .claude/settings.json
 
 If any opt-out signal is found, do not activate automatically; only apply this skill if the user explicitly requests it in this conversation.
 
@@ -43,9 +45,7 @@ Unit tests should:
 Check branch coverage and run tests: `pnpm exec vitest run src/foo.test.ts --coverage`
 Check for surviving mutants on the code being tested: `pnpm exec stryker run --mutate "src/foo.ts"`
 
-## Sub-skills
-
-### Verifying test setup
+## Verifying test setup
 
 1. Verify all the following packages are installed on the project: `vitest fast-check @stryker-mutator/core @stryker-mutator/vitest-runner @stryker-mutator/typescript-checker`
 2. Verify Vitest and Stryker configurations correctly include/exclude files. Stryker should not be checking files that only contain test data
@@ -55,11 +55,11 @@ Check for surviving mutants on the code being tested: `pnpm exec stryker run --m
 4. Look for any other configuration issues that might cause problems in the test writing workflow.
 5. Report findings to the user.
 
-### Writing Tests
+## Writing Tests
 
 When asked to write new tests, DO NOT MODIFY APPLICATION CODE OR EXISTING TESTS.
 
-First, **assess existing tests** by following [Assessing a module](#assessing-a-module). Create a new debrief file using [the template](#debrief-template) and record the initial coverage and mutation scores there.
+First, **assess existing tests** by following [Assessing a module](#assessing-a-module). Create a new debrief file using [the template](#test-debriefs) and record the initial coverage and mutation scores there.
 
 Second, **write tests following this process exactly**:
 
@@ -79,7 +79,7 @@ Do the following for each function/method in the module's interface, finishing o
 
 After writing tests for all functions, double-check that you added sections to the debrief for each function and finish writing the summary section.
 
-### Auditing Tests
+## Auditing Tests
 
 If prompted to audit the project as a whole, check project-wide code coverage and mutation scores, and recommend areas for more detailed audits or for adding/updating tests. Bias recommendations towards the most important and bug-prone areas of the codebase - core business logic, event-driven code, and complex functions.
 
@@ -105,9 +105,9 @@ Use this process whenever you need to evaluate an existing test file against the
 
 Format debriefs per the template below. If there is nothing to report in a function subsection, simply write "n/a". Output the debrief into a Markdown file in `debriefs/`.
 
-## Debrief: {moduleName/fileName}
+### Debrief: {moduleName/fileName}
 
-### Summary
+#### Summary
 
 **Coverage** (branch)
 Before: X% → After: Y%
@@ -116,11 +116,11 @@ Lines that could not be covered: {line ranges}
 **Mutation score** (total)
 Before: X% → After: Y%
 
-#### Issues
+##### Issues
 
 {bullet list of faulty assumptions, bugs found, issues found in tests, and failing tests. Each list item should begin with the project-root relative path to the file and line number(s) where the issue was found}
 
-### {functionName}
+#### {functionName}
 
 **Function purpose**
 {one sentence describing what the function is supposed to do}
