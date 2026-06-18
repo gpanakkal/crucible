@@ -14,6 +14,14 @@ When asked to write, fix, or audit unit tests on TypeScript projects.
 
 When writing end-to-end, integration, UI, or simulation tests.
 
+## Per-project opt-out
+Before activating, check whether the project has opted out of this skill. Look for any of the following:
+
+A .no-crucible file in the project root
+crucible: false anywhere in AGENTS.md or .claude/settings.json
+
+If any opt-out signal is found, do not activate automatically; only apply this skill if the user explicitly requests it in this conversation.
+
 ## Rules
 
 - Example commands use `pnpm`, but always use the project's package manager.
@@ -35,7 +43,9 @@ Unit tests should:
 Check branch coverage and run tests: `pnpm exec vitest run src/foo.test.ts --coverage`
 Check for surviving mutants on the code being tested: `pnpm exec stryker run --mutate "src/foo.ts"`
 
-## Verifying test setup
+## Sub-skills
+
+### Verifying test setup
 
 1. Verify all the following packages are installed on the project: `vitest fast-check @stryker-mutator/core @stryker-mutator/vitest-runner @stryker-mutator/typescript-checker`
 2. Verify Vitest and Stryker configurations correctly include/exclude files. Stryker should not be checking files that only contain test data
@@ -45,11 +55,11 @@ Check for surviving mutants on the code being tested: `pnpm exec stryker run --m
 4. Look for any other configuration issues that might cause problems in the test writing workflow.
 5. Report findings to the user.
 
-## Writing Tests
+### Writing Tests
 
 When asked to write new tests, DO NOT MODIFY APPLICATION CODE OR EXISTING TESTS.
 
-First, **assess existing tests** by following [Assessing a module](#assessing-a-module). Create a new debrief file using [the template](references/debrief-template.md) and record the initial coverage and mutation scores there.
+First, **assess existing tests** by following [Assessing a module](#assessing-a-module). Create a new debrief file using [the template](#debrief-template) and record the initial coverage and mutation scores there.
 
 Second, **write tests following this process exactly**:
 
@@ -69,9 +79,11 @@ Do the following for each function/method in the module's interface, finishing o
 
 After writing tests for all functions, double-check that you added sections to the debrief for each function and finish writing the summary section.
 
-## Auditing Tests
+### Auditing Tests
 
-Look for modules or functions (within the scope of the prompt) that don't have tests and report these to the user in the post-audit debrief.
+If prompted to audit the project as a whole, check project-wide code coverage and mutation scores, and recommend areas for more detailed audits or for adding/updating tests. Bias recommendations towards the most important and bug-prone areas of the codebase - core business logic, event-driven code, and complex functions.
+
+If prompted to audit a part of the project, look for modules or functions (within the scope of the prompt) that don't have tests and report these to the user in the post-audit debrief.
 
 For each module within scope of the prompt that has tests, follow [Assessing a module](#assessing-a-module). Then, if any test criteria are still unmet after the assessment fixes, follow [Writing Tests](#writing-tests) to fill the remaining gaps.
 
@@ -88,3 +100,53 @@ Use this process whenever you need to evaluate an existing test file against the
    - Fix any errors in mock implementations.
    - Look for performance bottlenecks.
 4. Record the coverage and mutation scores, plus any findings, in the debrief.
+
+## Test Debriefs
+
+Format debriefs per the template below. If there is nothing to report in a function subsection, simply write "n/a". Output the debrief into a Markdown file in `debriefs/`.
+
+## Debrief: {moduleName/fileName}
+
+### Summary
+
+**Coverage** (branch)
+Before: X% → After: Y%
+Lines that could not be covered: {line ranges}
+
+**Mutation score** (total)
+Before: X% → After: Y%
+
+#### Issues
+
+{bullet list of faulty assumptions, bugs found, issues found in tests, and failing tests. Each list item should begin with the project-root relative path to the file and line number(s) where the issue was found}
+
+### {functionName}
+
+**Function purpose**
+{one sentence describing what the function is supposed to do}
+(**confidence**: high | uncertain)
+{if uncertain: what's unclear and why}
+
+**Faulty assumptions found**
+
+- (line {line number/range}): {assumption about input type/range/shape that the function doesn't validate}
+
+**Bugs found in implementation**
+
+- (line {line number/range}): {description + line number}
+
+**Issues found in pre-existing tests**
+
+- (line {line number/range}): {issue description + test name}
+
+**Test cases written**
+
+- {brief description of each property/invariant tested}
+
+**Failing tests**
+
+- (line {line number/range}): {test name + reason}
+
+**Unkillable mutants**
+
+- (line {line number/range}): {brief description}
