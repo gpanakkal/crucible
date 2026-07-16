@@ -1,6 +1,6 @@
 ---
 name: crucible
-description: Write solid unit tests for TypeScript projects using property-based testing and mutation testing.
+description: Write solid unit tests using property-based testing and mutation testing. Use whenever unit tests are being written, fixed, audited, or reviewed in a TypeScript project; whether the user asks directly or test-writing occurs as a step inside another workflow (TDD, feature implementation, bug fixing, code review). Also use when checking test coverage or mutation scores, or when verifying the unit testing configuration. Provides test criteria and processes that other workflows should apply during their test-writing steps.
 compatibility: Designed for TypeScript projects.
 metadata:
    disable-model-invocation: "false"
@@ -10,13 +10,14 @@ metadata:
 
 ## When to use this
 
-When asked to write, fix, or audit unit tests on TypeScript projects.
+When unit tests on a TypeScript project are being written, fixed, or audited — whether requested directly or as a step inside another workflow (e.g., TDD, feature implementation, bug fixing).
 
 ## When NOT to use this
 
 When writing end-to-end, integration, UI, or simulation tests.
 
 ## Per-project opt-out
+
 Before activating, check whether the project has opted out of this skill. Look for any of the following:
 
 - A .no-crucible file in the project root
@@ -24,129 +25,25 @@ Before activating, check whether the project has opted out of this skill. Look f
 
 If any opt-out signal is found, do not activate automatically; only apply this skill if the user explicitly requests it in this conversation.
 
+## Modes
+
+Pick the mode that matches the task, then read **all** listed files before starting. Do not work from memory of their contents.
+
+| Mode | When | Read first |
+| --- | --- | --- |
+| Write tests | Adding new tests (standalone request or a test-writing step in another workflow) | [references/test-criteria.md](references/test-criteria.md), [references/writing-tests.md](references/writing-tests.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/debrief-template.md](references/debrief-template.md) |
+| Fix tests | Repairing existing tests without adding new ones | [references/test-criteria.md](references/test-criteria.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/debrief-template.md](references/debrief-template.md) |
+| Audit tests | Evaluating existing tests, project-wide or scoped | [references/test-criteria.md](references/test-criteria.md), [references/auditing-tests.md](references/auditing-tests.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/debrief-template.md](references/debrief-template.md) |
+| Verify setup | Checking that testing dependencies and configs are correct | [references/verifying-setup.md](references/verifying-setup.md) |
+
+[references/test-criteria.md](references/test-criteria.md) is mandatory reading in every mode that touches tests: it defines what "done" means.
+
 ## Rules
 
 - Example commands use `pnpm`, but always use the project's package manager.
-- Do not modify application code unless specifically prompted to do so.
-- When asked to add tests, do not modify existing tests.
-- When asked to fix tests, do not add new tests.
-- When asked to audit tests, fix existing tests and then add tests as needed to meet test criteria.
-
-## Test Criteria
-
-Unit tests should:
-
-- Have the maximum possible branch coverage per Vitest.
-- Kill all killable mutants, achieving the maximum possible mutation score out of all code in scope of the prompt (not just what's covered by tests). Unkillable mutants will prevent a score of 100.
-- Be property-based whenever possible, except if only a handful of input cases exist. E.g., a function with a single boolean parameter and no implicit inputs has only two possible input cases, so don't bother with making it property-based.
-- (if property-based) have arbitraries that cover all possible parameters and implicit inputs. It is vital that no cases that could occur in production are excluded. If necessary or unclear, err towards making arbitraries too broad.
-- Fail if they test erroneous code or if arbitraries are purposely made too broad. Think of tests as requirements: they should be named accordingly, and should automatically pass as soon as the user fixes the bug in the future after the user fixes the function and/or arbitraries. Don't use `test.fails`/`.skip`; this makes it less obvious to the user that attention is required, so tests passing when they shouldn't is the highest-priority error to avoid.
-
-Check branch coverage and run tests: `pnpm exec vitest run src/foo.test.ts --coverage`
-Check for surviving mutants on the code being tested: `pnpm exec stryker run --mutate "src/foo.ts"`
-
-## Verifying test setup
-
-1. Verify all the following packages are installed on the project: `vitest fast-check @stryker-mutator/core @stryker-mutator/vitest-runner @stryker-mutator/typescript-checker`
-2. Verify Vitest and Stryker configurations correctly include/exclude files. Stryker should not be checking files that only contain test data
-3. Verify Stryker config:
-    1.  Uses the `clear-text` reporter (other reporters optional).
-    2. Uses the TypeScript checker and correctly points to the TS config file.
-4. Look for any other configuration issues that might cause problems in the test writing workflow.
-5. Report findings to the user.
-
-## Writing Tests
-
-When asked to write new tests, DO NOT MODIFY APPLICATION CODE OR EXISTING TESTS.
-
-First, **assess existing tests** by following [Assessing a module](#assessing-a-module). Create a new debrief file using [the template](#test-debriefs) and record the initial coverage and mutation scores there.
-
-Second, **write tests following this process exactly**:
-
-Do the following for each function/method in the module's interface, finishing one function before starting the next:
-
-1. Determine the function's purpose by examining comments, its name, its type signature, and how it's used. If uncertain, make a note of this in the debrief, skip writing tests, and move on to the next function.
-2. Make note of any potential bugs in the function's implementation.
-3. Based on its purpose, identify any faulty assumptions the function makes about its parameters and implicit inputs, and make note of any input cases that are likely to lead to incorrect function behavior. For example, a function that takes a positive integer but doesn't validate its input makes a faulty assumption about its input.
-4. NEVER MODIFY PRE-EXISTING TESTS. If you find any problems in existing tests, notify the user of problems found in existing tests.
-5. Write new tests by doing the following:
-   a. Using `fast-check`, create property-based test stubs with arbitraries that cover all possible parameters and implicit inputs to the function. Use `fc.asyncProperty` + `await fc.assert(...)` when the function under test is async. If in doubt, err on the side of making arbitraries too broad and mention this in the debrief so the user can fix them. Name tests as descriptions of desired behavior.
-   b. Using `vitest`, write assertions within the stubs covering any returned values and side effects such as throwing exceptions, mutating inputs, mutating/reassigning variables from outer scopes, etc. Make sure tests assert desired behavior, catching the faulty assumptions/bugs identified earlier and failing accordingly.
-6. Re-check coverage: `pnpm exec vitest run src/foo.test.ts --coverage`
-7. Mutation test only the current function: `pnpm exec stryker run --mutate "src/foo.ts:<startLine>-<endLine>"`
-8. Revise the newly written tests and repeat steps 5a and 5b until test criteria (listed above) are met for the function.
-9. Update the debrief with a section on this function.
-
-After writing tests for all functions, double-check that you added sections to the debrief for each function and finish writing the summary section.
-
-## Auditing Tests
-
-If prompted to audit the project as a whole, check project-wide code coverage and mutation scores, and recommend areas for more detailed audits or for adding/updating tests. Bias recommendations towards the most important and bug-prone areas of the codebase - core business logic, event-driven code, and complex functions.
-
-If prompted to audit a part of the project, look for modules or functions (within the scope of the prompt) that don't have tests and report these to the user in the post-audit debrief.
-
-For each module within scope of the prompt that has tests, follow [Assessing a module](#assessing-a-module). Then, if any test criteria are still unmet after the assessment fixes, follow [Writing Tests](#writing-tests) to fill the remaining gaps.
-
-## Assessing a module
-
-Use this process whenever you need to evaluate an existing test file against the test criteria — both before writing new tests and when auditing.
-
-1. Check code coverage using Vitest: `pnpm exec vitest run src/foo.test.ts --coverage`.
-2. Check for surviving mutants using Stryker Mutator: `pnpm exec stryker run --mutate "src/foo.ts"`.
-3. For each function in the module that has tests:
-   - For property-based tests:
-     - Look for inputs that the function would accept without throwing or returning an error value, but cannot be generated by the arbitraries. Widen arbitraries as needed to include any such inputs.
-     - Look for inputs that aren't covered by arbitraries, especially implicit inputs such as class fields, global variables, date/time, and randomly generated numbers. Add arbitraries for these.
-   - Fix any errors in mock implementations.
-   - Look for performance bottlenecks.
-4. Record the coverage and mutation scores, plus any findings, in the debrief.
-
-## Test Debriefs
-
-Format debriefs per the template below. If there is nothing to report in a function subsection, simply write "n/a". Output the debrief into a Markdown file in `debriefs/`.
-
-### Debrief: {moduleName/fileName} {yyyy-mm-dd}
-
-#### Summary
-
-**Coverage** (branch)
-Before: X% → After: Y%
-Lines that could not be covered: {line ranges}
-
-**Mutation score** (total)
-Before: X% → After: Y%
-
-##### Issues
-
-{bullet list of faulty assumptions, bugs found, issues found in tests, and failing tests. Each list item should begin with the project-root relative path to the file and line number(s) where the issue was found}
-
-#### {functionName}
-
-**Function purpose**
-{one sentence describing what the function is supposed to do}
-(**confidence**: high | uncertain)
-{if uncertain: what's unclear and why}
-
-**Faulty assumptions found**
-
-- (line {line number/range}): {assumption about input type/range/shape that the function doesn't validate}
-
-**Bugs found in implementation**
-
-- (line {line number/range}): {description + line number}
-
-**Issues found in pre-existing tests**
-
-- (line {line number/range}): {issue description + test name}
-
-**Test cases written**
-
-- {brief description of each property/invariant tested}
-
-**Failing tests**
-
-- (line {line number/range}): {test name + reason}
-
-**Unkillable mutants**
-
-- (line {line number/range}): {brief description}
+- When invoked standalone:
+  - Do not modify application code unless specifically prompted to do so.
+  - When asked to add tests, do not modify existing tests.
+  - When asked to fix tests, do not add new tests.
+  - When asked to audit tests, fix existing tests and then add tests as needed to meet test criteria.
+- When embedded in another workflow (e.g., a TDD loop that owns code changes): that workflow's rules govern whether application code and in-progress tests may change, but the test criteria in [references/test-criteria.md](references/test-criteria.md) still apply in full, and tests that predate the workflow's current task must not be modified without telling the user.
