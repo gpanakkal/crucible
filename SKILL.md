@@ -31,9 +31,9 @@ Pick the mode that matches the task, then read **all** listed files before start
 
 | Mode | When | Read first |
 | --- | --- | --- |
-| Write tests | Adding new tests (standalone request or a test-writing step in another workflow) | [references/test-criteria.md](references/test-criteria.md), [references/writing-tests.md](references/writing-tests.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/debrief-template.md](references/debrief-template.md) |
-| Fix tests | Repairing existing tests without adding new ones | [references/test-criteria.md](references/test-criteria.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/debrief-template.md](references/debrief-template.md) |
-| Audit tests | Evaluating existing tests, project-wide or scoped | [references/test-criteria.md](references/test-criteria.md), [references/auditing-tests.md](references/auditing-tests.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/debrief-template.md](references/debrief-template.md) |
+| Write tests | Adding new tests (standalone request or a test-writing step in another workflow) | [references/test-criteria.md](references/test-criteria.md), [references/writing-tests.md](references/writing-tests.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/mutation-testing.md](references/mutation-testing.md), [references/debrief-template.md](references/debrief-template.md) |
+| Fix tests | Repairing existing tests without adding new ones | [references/test-criteria.md](references/test-criteria.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/mutation-testing.md](references/mutation-testing.md), [references/debrief-template.md](references/debrief-template.md) |
+| Audit tests | Evaluating existing tests, project-wide or scoped | [references/test-criteria.md](references/test-criteria.md), [references/auditing-tests.md](references/auditing-tests.md), [references/assessing-a-module.md](references/assessing-a-module.md), [references/mutation-testing.md](references/mutation-testing.md), [references/debrief-template.md](references/debrief-template.md) |
 | Verify setup | Checking that testing dependencies and configs are correct | [references/verifying-setup.md](references/verifying-setup.md) |
 
 [references/test-criteria.md](references/test-criteria.md) is mandatory reading in every mode that touches tests: it defines what "done" means.

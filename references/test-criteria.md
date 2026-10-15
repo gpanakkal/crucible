@@ -12,5 +12,5 @@ Unit tests should:
 
 ## Checking the criteria
 
-Check branch coverage and run tests: `pnpm exec vitest run src/foo.test.ts --coverage`
-Check for surviving mutants on the code being tested: `pnpm exec stryker run --mutate "src/foo.ts"`
+Check branch coverage and run tests: `pnpm exec vitest run src/foo.test.ts --coverage --coverage.include=src/foo.ts`
+Check for surviving mutants on the code being tested: see [mutation-testing.md](mutation-testing.md) for the command and when to run it.
